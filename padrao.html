@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Padrão Strategy - Cálculo de Frete</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f6fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        width: 360px;
+        text-align: center;
+    }
+    select, input, button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+    button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #43a047;
+    }
+    .resultado {
+        margin-top: 15px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h2>💡 Cálculo de Frete</h2>
+    <label for="peso">Peso (kg):</label>
+    <input type="number" id="peso" value="10" min="0">
+
+    <label for="tipoFrete">Tipo de Frete:</label>
+    <select id="tipoFrete">
+        <option value="correios">Correios</option>
+        <option value="transportadora">Transportadora</option>
+        <option value="expressa">Entrega Expressa</option>
+    </select>
+
+    <button id="calcular">Calcular</button>
+
+    <div class="resultado" id="resultado"></div>
+</div>
+
+<script>
+// ----------------------------
+// Interface: Estratégia de Frete
+// ----------------------------
+class FreteStrategy {
+    calcular(peso) {
+        throw new Error("Método 'calcular' deve ser implementado!");
+    }
+}
+
+// Estratégias Concretas
+class FreteCorreios extends FreteStrategy {
+    calcular(peso) { return peso * 5.0; }
+}
+
+class FreteTransportadora extends FreteStrategy {
+    calcular(peso) { return peso * 7.0; }
+}
+
+class FreteExpressa extends FreteStrategy {
+    calcular(peso) { return peso * 10.0; }
+}
+
+// Contexto
+class CalculadoraFrete {
+    constructor(estrategia) {
+        this.estrategia = estrategia;
+    }
+
+    calcular(peso) {
+        return this.estrategia.calcular(peso);
+    }
+}
+
+// ----------------------------
+// Interação com a página
+// ----------------------------
+document.getElementById("calcular").onclick = () => {
+    const peso = parseFloat(document.getElementById("peso").value);
+    const tipo = document.getElementById("tipoFrete").value;
+    let estrategia;
+
+    switch (tipo) {
+        case "correios":
+            estrategia = new FreteCorreios();
+            break;
+        case "transportadora":
+            estrategia = new FreteTransportadora();
+            break;
+        case "expressa":
+            estrategia = new FreteExpressa();
+            break;
+    }
+
+    const calculadora = new CalculadoraFrete(estrategia);
+    const valor = calculadora.calcular(peso);
+
+    document.getElementById("resultado").innerText =
+        `💰 Valor do frete: R$ ${valor.toFixed(2)}`;
+};
+</script>
+
+</body>
+</html>
